@@ -1,0 +1,94 @@
+﻿@* @model IEnumerable<ExamManagementSystem.Models.Section>
+
+@{
+    ViewData["Title"] = "Sections List";
+}
+
+<h2>Sections List</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New Section</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Section Name</th>
+            <th>Batch Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@(item.Batch?.Name ?? "No Batch")</td>
+                <td>
+                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+ *@
+
+
+ @model ExamManagementSystem.Models.Section
+@{
+    ViewData["Title"] = "Manage Sections";
+}
+
+<h2 class="mb-4">Manage Sections</h2>
+
+<p>
+    <a class="btn btn-primary mb-3" asp-action="Create">Create New Section</a>
+</p>
+
+<!-- ✅ Table rendered by JavaScript -->
+<table class="table table-bordered table-striped" id="sectionTable">
+    <thead>
+        <tr>
+            <th>Section Name</th>
+            <th>Batch Name</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Filled via JS -->
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadSections();
+        });
+
+        function loadSections() {
+            fetch('/Section/GetSections')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector("#sectionTable tbody");
+                    tbody.innerHTML = '';
+
+                    data.forEach(section => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${section.name}</td>
+                                <td>${section.batchName}</td>
+                                <td>
+                                    <a href="/Section/Edit/${section.id}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="/Section/Delete/${section.id}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>`;
+                    });
+                })
+                .catch(error => {
+                    alert("Failed to load sections.");
+                    console.error(error);
+                });
+        }
+    </script>
+}

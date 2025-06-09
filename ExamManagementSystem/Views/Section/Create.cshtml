@@ -1,0 +1,32 @@
+﻿@model ExamManagementSystem.Models.Section
+
+@{
+    ViewData["Title"] = "Create Section";
+}
+
+<h2>Create Section</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BatchId" class="control-label"></label>
+        <select asp-for="BatchId" class="form-control" asp-items="@(new SelectList(ViewBag.Batches, "Id", "Name"))">
+            <option value="">-- Select Batch --</option>
+        </select>
+        <span asp-validation-for="BatchId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

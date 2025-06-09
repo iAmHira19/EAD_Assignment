@@ -1,0 +1,106 @@
+﻿@* @model IEnumerable<ExamManagementSystem.Models.Room>
+
+<h2>Rooms</h2>
+
+<a asp-action="Create" class="btn btn-primary">Add New Room</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Room Name</th>
+            <th>Capacity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var room in Model)
+        {
+            <tr>
+                <td>@room.Name</td>
+                <td>@room.Capacity</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@room.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@room.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+ *@
+
+
+ @model ExamManagementSystem.Models.Room
+@{
+    ViewData["Title"] = "Manage Rooms";
+}
+
+<h2 class="mb-4">Manage Rooms</h2>
+
+<!-- ✅ Add Room Form -->
+<div class="card mb-4">
+    <div class="card-header">Add New Room</div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="Capacity" class="control-label"></label>
+                <input asp-for="Capacity" class="form-control" />
+                <span asp-validation-for="Capacity" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Add Room</button>
+        </form>
+    </div>
+</div>
+
+<!-- ✅ AJAX Table -->
+<table class="table table-bordered table-striped" id="roomTable">
+    <thead>
+        <tr>
+            <th>Room Name</th>
+            <th>Capacity</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Filled by JS -->
+    </tbody>
+</table>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+            loadRooms();
+        });
+
+        function loadRooms() {
+            fetch('/Room/GetRooms')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector("#roomTable tbody");
+                    tbody.innerHTML = '';
+
+                    data.forEach(room => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${room.name}</td>
+                                <td>${room.capacity}</td>
+                                <td>
+                                    <a href="/Room/Edit/${room.id}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="/Room/Delete/${room.id}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>`;
+                    });
+                })
+                .catch(error => {
+                    alert("Error loading rooms.");
+                    console.error(error);
+                });
+        }
+    </script>
+}

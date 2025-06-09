@@ -1,0 +1,107 @@
+﻿@* @model IEnumerable<ExamManagementSystem.Models.Batch>
+
+<h2>Batch List</h2>
+
+<p>
+    <a asp-action="Create">Create New Batch</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Batch Name</th>
+            <th>Year</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Year</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+ *@
+
+  @model ExamManagementSystem.Models.Batch
+
+@{
+    ViewData["Title"] = "Manage Batches";
+}
+
+<h2 class="mb-4">Manage Batches</h2>
+
+<!-- ✅ Add Batch Form -->
+<div class="card mb-4">
+    <div class="card-header">Add New Batch</div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Year" class="control-label"></label>
+                <input asp-for="Year" class="form-control" />
+                <span asp-validation-for="Year" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Add Batch</button>
+        </form>
+    </div>
+</div>
+
+<!-- ✅ AJAX-loaded Batch Table -->
+<table class="table table-bordered table-striped" id="batchTable">
+    <thead>
+        <tr>
+            <th>Batch Name</th>
+            <th>Year</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Will be filled dynamically -->
+    </tbody>
+</table>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+            loadBatches();
+        });
+
+        function loadBatches() {
+            fetch('/Batch/GetBatches')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector("#batchTable tbody");
+                    tbody.innerHTML = '';
+                    data.forEach(batch => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${batch.name}</td>
+                                <td>${batch.year}</td>
+                                <td>
+                                    <a href="/Batch/Edit/${batch.id}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="/Batch/Delete/${batch.id}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>`;
+                    });
+                })
+                .catch(error => {
+                    alert("Error loading batches.");
+                    console.error(error);
+                });
+        }
+    </script>
+}

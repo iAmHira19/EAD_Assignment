@@ -1,0 +1,153 @@
+﻿@* <!-- Views/Student/Index.cshtml -->
+@model IEnumerable<ExamManagementSystem.Models.Student>
+@{
+    ViewData["Title"] = "Students";
+}
+
+<h2>Student List</h2>
+
+<!-- Add Student Button -->
+<a asp-action="Create" class="btn btn-primary mb-3">Add Student</a>
+
+<!-- Search Form -->
+<form asp-action="Index" method="get" class="mb-3">
+    <input type="text" name="search" class="form-control" placeholder="Search by name, roll number, CNIC or course" />
+</form>
+
+<!-- Excel Upload Form -->
+<form asp-action="ImportExcel" asp-controller="Student" method="post" enctype="multipart/form-data" class="mb-4">
+    <div class="form-group">
+        <label>Select Excel File (.xlsx)</label>
+        <input type="file" name="excelFile" class="form-control" accept=".xlsx" required />
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Import Students</button>
+</form>
+
+<!-- Students Table -->
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>CNIC</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Course</th>
+            <th>Section</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Name</td>
+                <td>@s.RollNumber</td>
+                <td>@s.CNIC</td>
+                <td>@s.Age</td>
+                <td>@s.Address</td>
+                <td>@s.Course?.Name</td>
+                <td>@s.Section?.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+ *@
+
+
+                @model ExamManagementSystem.Models.Student
+@{
+    ViewData["Title"] = "Student List";
+}
+
+<h2>Student List</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Add Student</a>
+
+<!-- ✅ Search Form -->
+<form id="searchForm" class="mb-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search by name, roll number, CNIC, or course" />
+</form>
+
+<!-- ✅ Excel Import -->
+<form asp-action="ImportExcel" asp-controller="Student" method="post" enctype="multipart/form-data" class="mb-4">
+    <div class="form-group">
+        <label>Select Excel File (.xlsx)</label>
+        <input type="file" name="excelFile" class="form-control" accept=".xlsx" required />
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Import Students</button>
+</form>
+
+<!-- ✅ AJAX Table -->
+<table class="table table-bordered table-striped" id="studentTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>CNIC</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Course</th>
+            <th>Section</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- filled by JS -->
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadStudents();
+
+            // Trigger search on input
+            $('#searchInput').on('keyup', function () {
+                loadStudents($(this).val());
+            });
+        });
+
+        function loadStudents(query = "") {
+            fetch('/Student/GetStudents')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector("#studentTable tbody");
+                    tbody.innerHTML = "";
+
+                    const filtered = query.trim()
+                        ? data.filter(s =>
+                            s.name.toLowerCase().includes(query.toLowerCase()) ||
+                            s.rollNumber.toLowerCase().includes(query.toLowerCase()) ||
+                            s.cnic.includes(query) ||
+                            s.course.toLowerCase().includes(query.toLowerCase()))
+                        : data;
+
+                    filtered.forEach(s => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${s.name}</td>
+                                <td>${s.rollNumber}</td>
+                                <td>${s.cnic}</td>
+                                <td>${s.age}</td>
+                                <td>${s.address}</td>
+                                <td>${s.course}</td>
+                                <td>${s.section}</td>
+                                <td>
+                                    <a href="/Student/Edit/${s.id}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="/Student/Delete/${s.id}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>`;
+                    });
+                })
+                .catch(err => {
+                    alert("Error loading students.");
+                    console.error(err);
+                });
+        }
+    </script>
+}

@@ -1,0 +1,135 @@
+﻿@* @model ExamManagementSystem.Models.Course
+@{
+    ViewData["Title"] = "Manage Courses";
+}
+
+<h2 class="mb-4">Manage Courses</h2>
+
+<!-- Add Course Form -->
+<div class="card mb-4">
+    <div class="card-header">Add New Course</div>
+    <div class="card-body">
+        <form asp-action="Create">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Add Course</button>
+        </form>
+    </div>
+</div>
+
+<!-- List of Courses -->
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Course Name</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in ViewBag.CourseList as List<ExamManagementSystem.Models.Course>)
+        {
+            <tr>
+                <td>@course.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@course.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@course.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<button onclick="loadCourses()">Load Courses</button>
+<table id="courseTable"></table>
+
+<script>
+    function loadCourses() {
+        fetch('/Course/GetCourses')
+            .then(res => res.json())
+            .then(data => {
+                const table = document.getElementById('courseTable');
+                table.innerHTML = '';
+                data.forEach(course => {
+                    table.innerHTML += `<tr><td>${course.name}</td></tr>`;
+                });
+            });
+    }
+</script>
+
+ *@
+
+
+
+@model ExamManagementSystem.Models.Course
+@{
+    ViewData["Title"] = "Manage Courses";
+}
+
+<h2 class="mb-4">Manage Courses</h2>
+
+<!-- ✅ Add Course Form -->
+<div class="card mb-4">
+    <div class="card-header">Add New Course</div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Add Course</button>
+        </form>
+    </div>
+</div>
+
+<!-- ✅ AJAX-loaded Table -->
+<table class="table table-bordered table-striped" id="courseTable">
+    <thead>
+        <tr>
+            <th>Course Name</th>
+            <th style="width: 150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Populated dynamically -->
+    </tbody>
+</table>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+            loadCourses();
+        });
+
+        function loadCourses() {
+            fetch('/Course/GetCourses')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector("#courseTable tbody");
+                    tbody.innerHTML = '';
+
+                    data.forEach(course => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${course.name}</td>
+                                <td>
+                                    <a href="/Course/Edit/${course.id}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="/Course/Delete/${course.id}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>`;
+                    });
+                })
+                .catch(() => alert("Failed to load courses."));
+        }
+    </script>
+}
