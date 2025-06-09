@@ -94,3 +94,39 @@ ExamManagementSystem/
    ```bash
    git clone https://github.com/iAmHira19/EAD_Assignment.git
    cd EAD_Assignment
+
+   Setup the database
+Update your appsettings.json with your local SQL Server credentials and run migrations:
+
+dotnet ef database update
+Run the project
+
+dotnet run
+Access the system via browser
+Navigate to https://localhost:5001 or the assigned port
+
+📌 Future Improvements
+LMS integration (Learning Management Systems)
+
+Cloud deployment support (Azure, AWS)
+
+Email notifications for students and staff
+
+Real-time exam invigilation dashboard
+
+📧 Contact
+Developed by: Hira Amanat
+📧 Email: hiraamanatali19@gmail.com
+🔗 LinkedIn: linkedin.com/in/hira-amanat-800104245
+
+📃 License
+This project is licensed under the MIT License.
+
+
+
+
+
+
+
+
+
